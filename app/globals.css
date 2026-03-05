@@ -1,26 +1,54 @@
-@import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --pink-bg: #FDE8EF;
+  --pink-light: #FFF0F5;
+  --pink-mid: #F5C6D8;
+  --pink-dark: #E8A0BC;
+  --rose: #C9607A;
+  --rose-deep: #A8415C;
+  --white: #FFFFFF;
+  --text: #3D2030;
+  --muted: #9E7080;
+  --card: #FFF8FB;
+  --shadow: rgba(201,96,122,0.15);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-nunito), sans-serif;
+  background: var(--pink-bg);
+  color: var(--text);
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse at 10% 20%, rgba(255,200,220,0.4) 0%, transparent 50%),
+              radial-gradient(ellipse at 90% 80%, rgba(255,180,210,0.3) 0%, transparent 50%);
+}
+
+main {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - 68px - 200px); /* Adjust based on nav and footer height */
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
 }
