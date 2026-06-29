@@ -1,12 +1,5 @@
-// /home/pc/auracam/app/providers.tsx
-'use client'
-
-import { ToastProvider } from '@/components/Toast'
+"use client";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return (
-    <ToastProvider>
-      {children}
-    </ToastProvider>
-  )
+  return <>{children}</>;
 }

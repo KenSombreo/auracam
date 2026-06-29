@@ -1,43 +1,31 @@
-// /home/pc/auracam/app/layout.tsx
-import type { Metadata } from 'next'
-import { Nunito, Playfair_Display } from 'next/font/google'
-import './globals.css'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
-import { Providers } from './providers'
+// app/layout.tsx
+import type { Metadata } from "next";
+import { Inter, Playfair_Display, Dancing_Script, Great_Vibes, Cormorant_Garamond, Tangerine } from "next/font/google";
+import "./globals.css";
+import { Providers } from "./providers";
 
-const nunito = Nunito({ 
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-nunito',
-})
-
-const playfair = Playfair_Display({ 
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-playfair',
-})
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+const dancingScript = Dancing_Script({ subsets: ["latin"], variable: "--font-dancing" });
+const greatVibes = Great_Vibes({ weight: "400", subsets: ["latin"], variable: "--font-great" });
+const cormorant = Cormorant_Garamond({ subsets: ["latin"], variable: "--font-cormorant" });
+const tangerine = Tangerine({ weight: "700", subsets: ["latin"], variable: "--font-tangerine" });
 
 export const metadata: Metadata = {
-  title: 'AuraCam Rental – Cebu',
-  description: 'Professional cameras delivered to your door in Cebu. Perfect for content creators, events, travels, and everyday magic ✨',
-}
+  title: "AURACAM — Premium Camera Rentals",
+  description: "Rent high-end cameras, lenses, and accessories.",
+  icons: { icon: "/favicon.ico" },
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${nunito.variable} ${playfair.variable}`}>
-      <body>
-        <Providers>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-        </Providers>
+    <html
+      lang="en"
+      className={`${inter.variable} ${playfair.variable} ${dancingScript.variable} ${greatVibes.variable} ${cormorant.variable} ${tangerine.variable}`}
+    >
+      <body className="antialiased font-sans">
+        <Providers>{children}</Providers>
       </body>
     </html>
-  )
+  );
 }

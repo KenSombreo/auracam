@@ -1,11 +1,26 @@
-// app/page.tsx (update to include providers)
-import { Providers } from './providers'
-import HomePage from './home/page'
+// app/page.tsx
+"use client";
 
-export default function Page() {
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { HomeSection } from "@/components/HomeSection";
+import { CameraListSection } from "@/components/CameraListSection";
+import { SampleShotsSection } from "@/components/SampleShotsSection";
+import { BookingReviewsSection } from "@/components/BookingProofSection";
+import { BookingSection } from "@/components/BookingSection";
+import { TermsSection } from "@/components/TermsSection";
+
+export default function HomePage() {
   return (
-    <Providers>
-      <HomePage />
-    </Providers>
-  )
+    <main className="bg-background text-foreground">
+      <Navbar />
+      <HomeSection />
+      <CameraListSection />
+      <SampleShotsSection />
+      <TermsSection />  
+      <BookingReviewsSection />
+      <BookingSection />
+      <Footer />
+    </main>
+  );
 }
