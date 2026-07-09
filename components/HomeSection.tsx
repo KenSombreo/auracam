@@ -1,245 +1,238 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { ArrowRight, Truck, Clock3, ShieldCheck, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Camera, Clock3, ShieldCheck, Truck, Zap, Heart } from "lucide-react";
 
 const cameraImages = [
-  { src: "/cameras/g7xiii.png", shadow: "/shadows/g7xiii.png", alt: "Canon G7X Mark III" },
-  { src: "/cameras/g7xii.png", shadow: "/shadows/g7xii.png", alt: "Canon G7X Mark II" },
-  { src: "/cameras/r50.png", shadow: "/shadows/r50.png", alt: "Canon R50" },
-  { src: "/cameras/rx100.png", shadow: "/shadows/rx100.png", alt: "Sony RX100 III" },
-  { src: "/cameras/m100.png", shadow: "/shadows/m100.png", alt: "Canon M100" },
+  { src: "/cameras/g7xiii.png", alt: "Canon G7X Mark III" },
+  { src: "/cameras/g7xii.png", alt: "Canon G7X Mark II" },
+  { src: "/cameras/r50.png", alt: "Canon R50" },
+  { src: "/cameras/rx100.png", alt: "Sony RX100 III" },
+  { src: "/cameras/m100.png", alt: "Canon M100" },
 ];
 
 const features = [
-  { icon: Truck, label: "Free early handover" },
-  { icon: Clock3, label: "Free delivery, 4+ days" },
-  { icon: ShieldCheck, label: "Flexible rental periods" },
-  { icon: Zap, label: "Fast, hassle-free booking" },
+  { icon: Clock3, title: "Free early handover", desc: "Handover as early as 7\u20138 PM the day before your rental." },
+  { icon: Truck, title: "Free delivery", desc: "For rentals 4+ days within Cebu City, Talisay, Mandaue, and Banawa." },
+  { icon: ShieldCheck, title: "Flexible rental", desc: "Choose the rental period that suits your schedule." },
+  { icon: Zap, title: "Fast & secure booking", desc: "Easy reservation process with no security deposit." },
 ];
 
-function FloatingCamera({
-  camera,
-  floatDuration = 6,
-  lensGlint = false,
-  className = "",
-}: {
-  camera: { src: string; shadow: string; alt: string };
-  floatDuration?: number;
-  lensGlint?: boolean;
-  className?: string;
-}) {
+// Swap the hero camera every few seconds. AnimatePresence handles the
+// crossfade / scale-out-scale-in transition between the two images, and a
+// quick white "shutter" flash sells the idea that a photo is being taken
+// right as the camera switches.
+function AnimatedHeroCamera() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % cameraImages.length);
+    }, 3200);
+    return () => clearInterval(interval);
+  }, []);
+
+  const camera = cameraImages[index];
+
   return (
-    <div className={className}>
-      <div className="relative">
+    <div className="relative mx-auto aspect-square w-[85%] sm:w-[75%] lg:w-[80%]">
+      <AnimatePresence mode="wait">
         <motion.div
-          animate={{ y: [0, -14, 0], rotate: [-1.5, 1.5, -1.5] }}
-          transition={{ duration: floatDuration, repeat: Infinity, ease: "easeInOut" }}
-          className="relative aspect-square w-full"
-          style={{ filter: "drop-shadow(0 28px 28px rgba(40,20,10,0.5))" }}
+          key={camera.src}
+          initial={{ opacity: 0, scale: 0.82, rotate: -6, filter: "blur(6px)" }}
+          animate={{ opacity: 1, scale: 1, rotate: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, scale: 1.1, rotate: 6, filter: "blur(6px)" }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute inset-0"
         >
-          <Image src={camera.src} alt={camera.alt} fill className="object-contain" priority />
-
-          {lensGlint && (
-            <motion.div
-              aria-hidden
-              animate={{ opacity: [0, 0.55, 0], scale: [0.8, 1.1, 0.8] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="absolute left-[38%] top-[42%] h-[18%] w-[18%] rounded-full"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(255,245,230,0.9) 0%, rgba(255,245,230,0) 70%)",
-              }}
-            />
-          )}
+          <motion.div
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            className="relative h-full w-full"
+            style={{ filter: "drop-shadow(0 30px 30px rgba(60,20,25,0.35))" }}
+          >
+            <Image src={camera.src} alt={camera.alt} fill className="object-contain" priority />
+          </motion.div>
         </motion.div>
+      </AnimatePresence>
 
-        <motion.div
-          animate={{ scaleX: [1, 0.85, 1], opacity: [0.65, 0.42, 0.65] }}
-          transition={{ duration: floatDuration, repeat: Infinity, ease: "easeInOut" }}
-          className="relative mx-auto -mt-3 h-[18%] w-[72%]"
-        >
-          <Image src={camera.shadow} alt="" fill className="object-contain" />
-        </motion.div>
+      {/* dot indicators so it visually reads as "switching cameras" */}
+      <div className="absolute -bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5">
+        {cameraImages.map((cam, i) => (
+          <span
+            key={cam.src}
+            className="h-1.5 rounded-full transition-all duration-500"
+            style={{
+              width: i === index ? "1.25rem" : "0.375rem",
+              background: i === index ? "#C97B90" : "#F1C6D2",
+            }}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
 export function HomeSection() {
-  const [active, setActive] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActive((prev) => (prev + 1) % cameraImages.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const leftCam = cameraImages[3];
-  const rightCam = cameraImages[4];
-  const heroCam = cameraImages[active];
-
   return (
     <section
       id="home"
-      className="relative flex min-h-screen flex-col overflow-hidden"
+      className="relative overflow-hidden bg-cover bg-center bg-no-repeat"
       style={{
-        background: "linear-gradient(160deg, #FFF0F5 0%, #FFD1DC 45%, #FFB6C1 100%)",
+        backgroundImage: "url('/background.png')",
       }}
     >
-      <div className="relative flex flex-1 items-center justify-center px-4 py-6 sm:py-8">
-        {/* ===== UPPER LEFT: Brand Text =====
-            Key fix: narrower max-width on lg+ so this column never reaches
-            into the centered camera's footprint, and it stays above the
-            camera via z-20 + its own background-free text (no overlap
-            collision since camera is now shifted right on lg+). */}
+      {/* soft decorative sparkles */}
+      <span className="pointer-events-none absolute left-[6%] top-[22%] text-2xl text-[#F4B8C6]">✦</span>
+      <span className="pointer-events-none absolute left-[30%] top-[14%] text-lg text-[#F4B8C6]">✦</span>
+      <span className="pointer-events-none absolute left-[16%] top-[46%] text-xl text-[#F4B8C6]">♡</span>
+
+      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 pb-16 pt-10 lg:grid-cols-2 lg:gap-6 lg:px-10 lg:pt-16">
+        {/* ===== LEFT: Text ===== */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: -24 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="absolute top-18 left-4 sm:top-6 sm:left-6 md:top-16 md:left-10 lg:top-10 lg:left-8 xl:top-14 xl:left-14 z-20 text-left max-w-xs sm:max-w-sm md:max-w-sm lg:max-w-[15rem] xl:max-w-[17rem]"
+          transition={{ duration: 0.7 }}
+          className="relative z-10 text-left"
         >
+          <div className="mb-4 flex items-center gap-2">
+            <span
+              className="text-xs font-semibold uppercase tracking-[0.2em]"
+              style={{ color: "#C97B90", fontFamily: "var(--font-inter), sans-serif" }}
+            >
+              Cebu's Trusted Camera Rental
+            </span>
+            <span className="text-[#C97B90]">✦</span>
+          </div>
+
           <h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold"
-            style={{
-              fontFamily: "var(--font-playfair), serif",
-              color: "#800000",
-            }}
+            className="text-6xl font-bold leading-[0.95] sm:text-7xl lg:text-6xl xl:text-7xl"
+            style={{ fontFamily: "var(--font-playfair), serif", color: "#2E1512" }}
           >
-            AURA<span style={{ color: "#A52A2A" }}>CAM</span>
+            Capture
+            <br />
+            <span
+              className="inline-block"
+              style={{ fontFamily: "var(--font-great), cursive", color: "#D98CA0", fontWeight: 500 }}
+            >
+              Beautiful
+            </span>
+            <br />
+            Moments{" "}
+            <Heart className="inline h-8 w-8 -translate-y-2 text-[#D98CA0]" fill="none" />
           </h1>
 
           <p
-            className="text-lg sm:text-xl md:text-2xl lg:text-xl xl:text-2xl font-medium mt-1"
-            style={{
-              fontFamily: "var(--font-great), cursive",
-              color: "#8B1A4A",
-            }}
+            className="mt-6 max-w-md text-base leading-relaxed"
+            style={{ fontFamily: "var(--font-inter), sans-serif", color: "#6B4A4F" }}
           >
-            Cebu's Trusted Camera Rental
+            High-quality cameras at affordable rates. Perfect for shoots, travels, events, and more.
           </p>
 
-          <p
-            className="mt-2 text-xs sm:text-sm md:text-base lg:text-sm xl:text-base max-w-xs sm:max-w-sm"
-            style={{
-              fontFamily: "var(--font-inter), sans-serif",
-              color: "#5A3A4A",
-            }}
-          >
-            Need a camera for your next shoot, trip, event, or project?{" "}
-            <span style={{ fontWeight: 700, color: "#800000" }}>Auracam</span> makes it easy to rent quality cameras at affordable rates.
-          </p>
-        </motion.div>
-
-        {/* ===== CENTER: "shoot" wordmark + camera =====
-            Key fix: on lg+ the whole camera stack is shifted right
-            (lg:translate-x-28 xl:translate-x-40) so it sits in its own
-            visual lane to the right of the text column instead of
-            centered over it. On mobile/tablet it stays centered, which
-            is already correct per your screenshot description. */}
-        <div className="relative flex flex-col items-center justify-center w-full">
-          <motion.h1
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="pointer-events-none absolute top-[52%] select-none text-center font-black leading-none text-[#800000]/20"
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: "clamp(3.5rem, 12vw, 11.5rem)",
-              letterSpacing: "-0.03em",
-              transform: "translateY(-50%)",
-            }}
-          >
-            shoot
-          </motion.h1>
-
-          <motion.div
-            initial={{ opacity: 0, x: -40, y: 10, rotate: -4 }}
-            animate={{ opacity: 0.9, x: 0, y: 0, rotate: -4 }}
-            transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute left-[2%] top-[58%] hidden w-24 -translate-y-1/2 md:block lg:left-[6%] lg:w-44"
-          >
-            <FloatingCamera camera={leftCam} floatDuration={6.5} />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 40, y: 10, rotate: 4 }}
-            animate={{ opacity: 0.9, x: 0, y: 0, rotate: 4 }}
-            transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute right-[2%] top-[58%] hidden w-24 -translate-y-1/2 md:block lg:right-[6%] lg:w-44"
-          >
-            <FloatingCamera camera={rightCam} floatDuration={7.5} />
-          </motion.div>
-
-          <motion.div
-            key={active}
-            initial={{ opacity: 0, y: 50, scale: 0.85 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 mt-16 sm:mt-12 md:mt-8 w-56 sm:w-72 md:w-80 lg:w-[28rem]"
-          >
-            <FloatingCamera camera={heroCam} floatDuration={5.5} lensGlint />
-          </motion.div>
-        </div>
-
-        {/* ===== BOTTOM CENTER: Features + Buttons ===== */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 w-full max-w-4xl px-2 sm:px-4"
-        >
-          <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-            {features.map((feature, idx) => (
-              <motion.div
-                key={feature.label}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9 + idx * 0.08 }}
-                className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] sm:text-xs font-medium"
-                style={{
-                  fontFamily: "var(--font-inter), sans-serif",
-                  background: "rgba(255, 240, 245, 0.8)",
-                  color: "#8B1A4A",
-                  border: "1px solid #FFB6C1",
-                }}
-              >
-                <feature.icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" style={{ color: "#800000" }} />
-                <span>{feature.label}</span>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-1">
+          <div className="mt-8 flex flex-wrap items-center gap-4">
             <a
               href="#camera-list"
-              className="group inline-flex items-center gap-1 rounded-full px-3 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm font-semibold text-white transition-all hover:shadow-lg"
-              style={{
-                fontFamily: "var(--font-inter), sans-serif",
-                background: "#800000",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "#5C0000"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "#800000"; }}
+              className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:shadow-lg"
+              style={{ background: "#C97B90", fontFamily: "var(--font-inter), sans-serif" }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#B15E75")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#C97B90")}
             >
-              Browse cameras
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 transition-transform group-hover:translate-x-1" />
+              Browse Cameras
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </a>
             <a
-              href="#booking"
-              className="inline-flex items-center gap-1 rounded-full border-2 px-3 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm font-semibold transition-all"
-              style={{
-                fontFamily: "var(--font-inter), sans-serif",
-                borderColor: "#FFB6C1",
-                color: "#8B1A4A",
-              }}
+              href="#sample-shots"
+              className="inline-flex items-center gap-2 rounded-full border-2 px-6 py-3 text-sm font-semibold transition-colors"
+              style={{ borderColor: "#F1C6D2", color: "#8B1A4A", fontFamily: "var(--font-inter), sans-serif" }}
             >
-              Book now
+              See Sample Shots
+              <Camera className="h-4 w-4" />
             </a>
           </div>
         </motion.div>
+
+        {/* ===== RIGHT: Camera stage ===== */}
+        <motion.div
+          initial={{ opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.7, delay: 0.15 }}
+          className="relative z-10 flex items-center justify-center"
+        >
+          {/* arch backdrop */}
+          <div
+            className="absolute h-[85%] w-[85%] rounded-t-full"
+            style={{ background: "linear-gradient(180deg, #FFD9E0 0%, #FFC3CE 100%)", opacity: 0.6 }}
+          />
+          {/* pedestal */}
+          <div
+            className="absolute bottom-[6%] h-[18%] w-[70%] rounded-[50%]"
+            style={{ background: "linear-gradient(180deg, #F6A9BB 0%, #F0879F 100%)", filter: "blur(2px)", opacity: 0.7 }}
+          />
+
+          <AnimatedHeroCamera />
+
+          {/* free early handover badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="absolute bottom-[6%] right-[2%] flex h-28 w-28 flex-col items-center justify-center rounded-full text-center shadow-md sm:h-32 sm:w-32"
+            style={{ background: "#FCE4EA", border: "2px solid #F4B8C6" }}
+          >
+            <Heart className="mb-1 h-3.5 w-3.5" style={{ color: "#C97B90" }} fill="#C97B90" />
+            <span
+              className="text-[10px] font-bold leading-tight sm:text-xs"
+              style={{ color: "#8B1A4A", fontFamily: "var(--font-inter), sans-serif" }}
+            >
+              FREE EARLY
+              <br />
+              HANDOVER
+              <br />
+              7&ndash;8 PM
+            </span>
+          </motion.div>
+        </motion.div>
       </div>
+
+      {/* ===== Feature strip ===== */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className="mx-auto mb-14 max-w-6xl px-6"
+      >
+        <div
+          className="grid grid-cols-1 gap-6 rounded-3xl px-8 py-8 sm:grid-cols-2 lg:grid-cols-4"
+          style={{ background: "rgba(255,255,255,0.75)", boxShadow: "0 20px 50px -20px rgba(180,90,110,0.25)" }}
+        >
+          {features.map((feature) => (
+            <div key={feature.title} className="flex items-start gap-3">
+              <div
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full"
+                style={{ background: "#FCE4EA" }}
+              >
+                <feature.icon className="h-5 w-5" style={{ color: "#C97B90" }} />
+              </div>
+              <div>
+                <p
+                  className="text-sm font-bold uppercase tracking-wide"
+                  style={{ color: "#8B1A4A", fontFamily: "var(--font-inter), sans-serif" }}
+                >
+                  {feature.title}
+                </p>
+                <p
+                  className="mt-1 text-sm leading-snug"
+                  style={{ color: "#6B4A4F", fontFamily: "var(--font-inter), sans-serif" }}
+                >
+                  {feature.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
     </section>
   );
-} 
+}

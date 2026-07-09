@@ -82,10 +82,15 @@ export function SampleShotsSection() {
       id="sample-shots"
       className="relative py-20 overflow-hidden"
       style={{
-        background: "linear-gradient(160deg, #FFF0F5 0%, #FFD1DC 45%, #FFB6C1 100%)",
+        // Use background3.png as full‑opacity background
+        backgroundImage: "url('/background3.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundColor: "#FFF0F5", // fallback light pink
       }}
     >
-      {/* Decorative blurs – soft pink & maroon */}
+      {/* Decorative blurs – soft pink & maroon – kept for ambiance */}
       <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#800000]/10 rounded-full blur-3xl" />
       <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-pink-200/40 rounded-full blur-3xl" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-pink-100/20 rounded-full blur-3xl" />
